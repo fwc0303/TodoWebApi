@@ -53,15 +53,15 @@ namespace TodoWebApi.Controllers
             return Ok(tasklists);
         }
 
-        [HttpGet("GetTasksById/{taskId}")]
+        [HttpGet("GetTasksById/{id}"), Authorize(Roles = "Admin")]
         [ProducesResponseType(200, Type = typeof(Tasks))]
         [ProducesResponseType(400)]
-        public IActionResult GetTasksById(int taskId)
+        public IActionResult GetTasksById(int id)
         {
-            if (!_tasksRepository.TaskExists(taskId))
+            if (!_tasksRepository.TaskExists(id))
                 return NotFound();
 
-            var tasks = _mapper.Map<TasksDto>(_tasksRepository.GetTasksById(taskId));
+            var tasks = _mapper.Map<TasksDto>(_tasksRepository.GetTasksById(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -69,7 +69,7 @@ namespace TodoWebApi.Controllers
             return Ok(tasks);
         }
 
-        [HttpGet("GetAlert")]
+        [HttpGet("GetAlert"), Authorize]
         [ProducesResponseType(200, Type = typeof(Tasks))]
         [ProducesResponseType(400)]
         public IActionResult GetAlert()
@@ -108,7 +108,7 @@ namespace TodoWebApi.Controllers
             return Ok(message);
         }
 
-        [HttpGet("SearchTasksByPriority/{priority}")]
+        [HttpGet("SearchTasksByPriority/{priority}"), Authorize]
         [ProducesResponseType(200, Type = typeof(Tasks))]
         [ProducesResponseType(400)]
         public IActionResult SearchTasksByPriority(ushort priority)
@@ -119,7 +119,7 @@ namespace TodoWebApi.Controllers
                 email = emails;
             }
 
-            var tasks = _mapper.Map<List<TasksDto>>(_tasksRepository.GetTasksByPriority(email, priority));
+            var tasks = _mapper.Map<List<Tasks>>(_tasksRepository.GetTasksByPriority(email, priority));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -127,7 +127,7 @@ namespace TodoWebApi.Controllers
             return Ok(tasks);
         }
 
-        [HttpGet("SearchTasksByStatus/{status}")]
+        [HttpGet("SearchTasksByStatus/{status}"), Authorize]
         [ProducesResponseType(200, Type = typeof(Tasks))]
         [ProducesResponseType(400)]
         public IActionResult SearchTasksByStatus(ushort status)
@@ -138,7 +138,7 @@ namespace TodoWebApi.Controllers
                 email = emails;
             }
 
-            var tasks = _mapper.Map<List<TasksDto>>(_tasksRepository.GetTasksByStatus(email, status));
+            var tasks = _mapper.Map<List<Tasks>>(_tasksRepository.GetTasksByStatus(email, status));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -147,7 +147,7 @@ namespace TodoWebApi.Controllers
         }
 
 
-        [HttpGet("GetAllTaskSortedByDueDate")]
+        [HttpGet("GetAllTaskSortedByDueDate"), Authorize]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Tasks>))]
         public IActionResult GetAllTaskSortByDueDate()
         {
@@ -165,7 +165,7 @@ namespace TodoWebApi.Controllers
             return Ok(tasklists);
         }
 
-        [HttpGet("GetAllTaskSortedByPriority")]
+        [HttpGet("GetAllTaskSortedByPriority"), Authorize]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Tasks>))]
         public IActionResult GetAllTaskSortByPriority()
         {
@@ -183,7 +183,7 @@ namespace TodoWebApi.Controllers
             return Ok(tasklists);
         }
 
-        [HttpGet("GetAllTaskSortedByStatus")]
+        [HttpGet("GetAllTaskSortedByStatus"), Authorize]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Tasks>))]
         public IActionResult GetAllTaskSortedByStatus()
         {
@@ -201,8 +201,7 @@ namespace TodoWebApi.Controllers
             return Ok(tasklists);
         }
 
-        [HttpPost("createTask")]
-        [ProducesResponseType(204)]
+        [HttpPost("CreateTask"), Authorize]
         [ProducesResponseType(400)]
         public IActionResult CreateTask([FromBody] TasksDto request)
         {
@@ -222,14 +221,14 @@ namespace TodoWebApi.Controllers
             if (!enumPriorityValues.Contains(request.Priority)) 
             {
                 ModelState.AddModelError("", "Priority not exists");
-                return StatusCode(422, ModelState);
+                return StatusCode(423, ModelState);
             }
 
             var enumStatusValues = Enum.GetValues(typeof(StatusEnum)).Cast<int>().ToArray();
             if (!enumStatusValues.Contains(request.Status))
             {
                 ModelState.AddModelError("", "Status not exists");
-                return StatusCode(423, ModelState);
+                return StatusCode(424, ModelState);
             }
 
             task.Name = request.Name;
@@ -249,7 +248,7 @@ namespace TodoWebApi.Controllers
             return Ok("Successfully created");
         }
 
-        [HttpPut("updateTaskById/{id}")]
+        [HttpPut("UpdateTaskById/{id}"), Authorize]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -303,7 +302,7 @@ namespace TodoWebApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("deleteTaskById/{id}")]
+        [HttpDelete("DeleteTaskById/{id}"), Authorize]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

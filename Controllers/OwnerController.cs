@@ -32,7 +32,7 @@ namespace TodoWebApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("MyName"), Authorize(Roles = "Admin")]
+        [HttpGet("MyName"), Authorize]
         public ActionResult<string> GetMe()
         {
             var userName = _ownerService.GetMyName();
@@ -46,7 +46,7 @@ namespace TodoWebApi.Controllers
             return Ok(email);
         }
 
-        [HttpPost("register")]
+        [HttpPost("Register")]
         [ProducesResponseType(400)]
         public IActionResult CreateOwner([FromBody] OwnerDto request)
         {
@@ -58,7 +58,7 @@ namespace TodoWebApi.Controllers
             if (owners != null)
             {
                 ModelState.AddModelError("", "Owner already exists");
-                return StatusCode(422, ModelState);
+                return StatusCode(420, ModelState);
             }
 
             if (!ModelState.IsValid)
@@ -87,7 +87,7 @@ namespace TodoWebApi.Controllers
             return Ok("Successfully created");
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(LoginDto request)
         {
             var owners = _ownerRepository.GetOwnerByEmail(request.Email);
@@ -95,7 +95,7 @@ namespace TodoWebApi.Controllers
             if (owners == null)
             {
                 ModelState.AddModelError("", "Owner not exists");
-                return StatusCode(422, ModelState);
+                return StatusCode(421, ModelState);
             }
 
             if (!VerifyPasswordHash(request.Password, owners.PasswordHash, owners.PasswordSalt))
@@ -196,7 +196,7 @@ namespace TodoWebApi.Controllers
             if (owners == null)
             {
                 ModelState.AddModelError("", "Owner not exists");
-                return StatusCode(422, ModelState);
+                return StatusCode(421, ModelState);
             }
 
             if (!VerifyPasswordHash(request.OldPassword, owners.PasswordHash, owners.PasswordSalt))
