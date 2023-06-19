@@ -72,8 +72,9 @@ namespace TodoWebApi.Controllers
             owner.Name = request.Name;
             owner.Role = request.Role;
 
-            var refreshToken = GenerateRefreshToken();
-            SetRefreshToken(refreshToken);
+            owner.RefreshToken = "";
+            owner.TokenCreated = DateTime.Now;
+            owner.TokenCreated = DateTime.Now;
 
             var ownerMap = _mapper.Map<Owner>(owner);
 
